@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from "vue";
+import { ref, watch, nextTick, onMounted } from "vue";
 import { useBuilder } from "../composables/useBuilder";
 import { colorHex } from "../lib/cardDisplay";
 
@@ -16,8 +16,14 @@ function resizeTextarea() {
 
 function handleDecklistChange(e: Event) {
   state.decklistText = (e.target as HTMLTextAreaElement).value;
+  state.hasChecked = false;
   nextTick(resizeTextarea);
 }
+
+watch(
+  () => state.decklistText,
+  () => nextTick(resizeTextarea)
+);
 
 onMounted(() => {
   requestAnimationFrame(resizeTextarea);
@@ -40,6 +46,15 @@ onMounted(() => {
       <li>
         We'll match each line to a card in the database and flag anything we can't
         find so you can pick the right printing before continuing.
+      </li>
+      <li>
+        Tokens created by your cards (e.g. "create a Might token") are added
+        automatically — no need to list them yourself.
+      </li>
+      <li>
+        Importing from <a href="https://fabrary.net/" target="_blank" rel="noopener">FaBrary</a>?
+        Open your deck's <code>⋮</code> menu and choose "Copy card list to
+        clipboard", then paste it here — we'll clean it up automatically.
       </li>
     </ul>
 

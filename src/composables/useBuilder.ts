@@ -1,8 +1,9 @@
 import { reactive, computed } from "vue";
 import type { Card, ParsedRow, ResolvedCard, ProxyCardProps } from "../lib/types";
-import { normalizeDb, buildIndex, parseDecklist } from "../lib/deckParser";
+import { normalizeDb, buildIndex, parseDecklist, cleanDecklistText } from "../lib/deckParser";
 import { buildDisplayProps } from "../lib/cardDisplay";
 import { classifyGroup, maxQtyFor } from "../lib/classify";
+import { collectAutoTokens } from "../lib/tokens";
 
 type Step = "deck" | "preview" | "print";
 type PaperSize = "letter" | "a4" | "legal";
@@ -41,6 +42,7 @@ function ensureDbLoaded(): Promise<void> {
 }
 
 function parseDeck() {
+  state.decklistText = cleanDecklistText(state.decklistText);
   state.parsedRows = parseDecklist(state.decklistText, state.dbIndex);
   state.hasChecked = true;
 }
@@ -53,7 +55,7 @@ function chooseMatch(rowIndex: number, matchIndex: number) {
 }
 
 function buildResolvedFromParsed() {
-  state.resolvedCards = state.parsedRows
+  const manual = state.parsedRows
     .filter((r) => r.status === "ok" && r.chosenIndex !== null)
     .map((row, i) => {
       const card = row.matches[row.chosenIndex!];
@@ -65,6 +67,7 @@ function buildResolvedFromParsed() {
         printing: card.printings[0] || null,
       };
     });
+  state.resolvedCards = [...manual, ...collectAutoTokens(manual, state.dbIndex)];
 }
 
 function goToDeck() {

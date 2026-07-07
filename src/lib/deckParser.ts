@@ -110,7 +110,34 @@ export function parseLine(line: string, index: Map<string, Card[]> | null): Pars
   return { qty, name: rest, matches, chosenIndex, status };
 }
 
+const CARD_LINE = /^\d+\s*x?\s+\S/i;
+const HERO_LINE = /^hero:\s*(.+)$/i;
+
+/**
+ * Deck-builder exports (e.g. FaBrary) wrap the actual decklist in header/
+ * footer metadata — deck name, format, section labels, attribution. This
+ * strips all of that down to just card lines, pulling the hero out of its
+ * "Hero: <name>" line and turning it into a normal "1 <name>" card line.
+ */
+export function cleanDecklistText(text: string): string {
+  const lines = text.split("\n").map((l) => l.trim());
+  const output: string[] = [];
+  for (const line of lines) {
+    const heroMatch = line.match(HERO_LINE);
+    if (heroMatch) {
+      const heroName = heroMatch[1].trim();
+      if (heroName) output.push(`1 ${heroName}`);
+      continue;
+    }
+    if (CARD_LINE.test(line)) output.push(line);
+  }
+  return output.join("\n");
+}
+
 export function parseDecklist(text: string, index: Map<string, Card[]> | null): ParsedRow[] {
-  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => CARD_LINE.test(l));
   return lines.map((l) => parseLine(l, index));
 }
