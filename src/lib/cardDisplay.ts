@@ -46,23 +46,23 @@ export function colorHex(color: string): string {
   return "#FFFFFF";
 }
 
-const ICON_BASE = "https://cdn.jsdelivr.net/gh/game-icons/icons@master/";
+const ICON_BASE = `${import.meta.env.BASE_URL}icons/`;
 const TYPE_ICON_MAP: Record<string, string> = {
-  hero: "cathelineau/swordman.svg",
-  legs: "lorc/boots.svg",
-  arms: "delapouite/gauntlet.svg",
-  head: "lorc/barbute.svg",
-  chest: "lorc/breastplate.svg",
-  weapon: "lorc/battle-axe.svg",
-  attackReaction: "andymeneely/riposte.svg",
-  attack: "lorc/crossed-swords.svg",
-  defenseReaction: "felbrigg/dodge.svg",
-  block: "sbed/shield.svg",
-  instant: "delapouite/sparkles.svg",
-  token: "lorc/metal-disc.svg",
-  item: "lorc/round-bottom-flask.svg",
-  aura: "lorc/aura.svg",
-  action: "lorc/punch.svg",
+  hero: "hero.svg",
+  legs: "legs.svg",
+  arms: "arms.svg",
+  head: "head.svg",
+  chest: "chest.svg",
+  weapon: "weapon.svg",
+  attackReaction: "attack-reaction.svg",
+  attack: "attack.svg",
+  defenseReaction: "defense-reaction.svg",
+  block: "block.svg",
+  instant: "instant.svg",
+  token: "token.svg",
+  item: "item.svg",
+  aura: "aura.svg",
+  action: "action.svg",
 };
 
 export function classifyIconKey(types: string[] | undefined): string | null {

@@ -26,3 +26,18 @@ node scripts/build-cards.mjs
 
 A scheduled GitHub Action (`.github/workflows/update-cards.yml`) re-runs this
 weekly and commits the result if the upstream database changed.
+
+## Icon attribution
+
+The card-type watermark icons in `public/icons/` are from
+[game-icons.net](https://game-icons.net), licensed
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
+
+| File | Author |
+| --- | --- |
+| `hero.svg` | Cathelineau |
+| `legs.svg`, `head.svg`, `chest.svg`, `weapon.svg`, `attack.svg`, `token.svg`, `item.svg`, `aura.svg`, `action.svg` | Lorc |
+| `arms.svg`, `instant.svg` | Delapouite |
+| `attack-reaction.svg` | Andymeneely |
+| `defense-reaction.svg` | Felbrigg |
+| `block.svg` | sbed |
