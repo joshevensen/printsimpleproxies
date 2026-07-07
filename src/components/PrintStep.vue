@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { useBuilder } from "../composables/useBuilder";
+import { usePrintSheet } from "../composables/usePrintSheet";
 import ProxyCard from "./ProxyCard.vue";
 
-const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCount, printPageStyle, cutGuideOutline } =
-  useBuilder();
+const {
+  printState,
+  doPrint,
+  setPaperSize,
+  toggleBorderless,
+  toggleCutGuides,
+  pageCount,
+  printPages,
+  printPageStyle,
+  printGridStyle,
+  printSheetHeight,
+  cutGuideOutline,
+} = usePrintSheet();
 </script>
 
 <template>
@@ -13,11 +24,15 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
     <div class="fab-app-chrome print-step">
       <h1 class="print-step__title">Ready to Print</h1>
       <ul class="print-step__rules">
-        <li>{{ state.printCards.length }} cards will fill {{ pageCount }} sheet(s), 9 cards per page.</li>
+        <li>{{ printState.printCards.length }} cards will fill {{ pageCount }} sheet(s), 9 cards per page.</li>
         <li>Pick a paper size that matches what's loaded in your printer.</li>
         <li>Cut guides add a dashed outline around each card so you can trim it accurately after printing.</li>
         <li>Borderless removes the page margin. Cards stay at their true size and are centered on the page.</li>
         <li>For best results, print at 100% scale (not "fit to page") so cards come out at true size.</li>
+        <li>
+          In the print dialog, set Margins to "Default" — a "None" or custom margin
+          overrides the margin/borderless setting above.
+        </li>
       </ul>
 
       <div class="print-step__panel">
@@ -29,8 +44,8 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
               :key="size"
               class="print-step__segment"
               :style="{
-                background: state.paperSize === size ? '#B5451E' : 'transparent',
-                color: state.paperSize === size ? '#f7f4ec' : 'inherit',
+                background: printState.paperSize === size ? '#B5451E' : 'transparent',
+                color: printState.paperSize === size ? '#f7f4ec' : 'inherit',
               }"
               @click="setPaperSize(size)"
             >
@@ -44,8 +59,8 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
             <div class="print-step__toggle-label">Borderless</div>
             <div class="print-step__toggle-desc">No page margin; cards stay true size and centered</div>
           </div>
-          <div class="print-step__switch" :style="{ background: state.borderless ? '#B5451E' : 'oklch(0.85 0.01 80)' }">
-            <div class="print-step__switch-knob" :style="{ left: state.borderless ? '19px' : '3px' }"></div>
+          <div class="print-step__switch" :style="{ background: printState.borderless ? '#B5451E' : 'oklch(0.85 0.01 80)' }">
+            <div class="print-step__switch-knob" :style="{ left: printState.borderless ? '19px' : '3px' }"></div>
           </div>
         </div>
 
@@ -54,8 +69,8 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
             <div class="print-step__toggle-label">Cut guides</div>
             <div class="print-step__toggle-desc">Dashed outline around each card</div>
           </div>
-          <div class="print-step__switch" :style="{ background: state.cutGuides ? '#B5451E' : 'oklch(0.85 0.01 80)' }">
-            <div class="print-step__switch-knob" :style="{ left: state.cutGuides ? '19px' : '3px' }"></div>
+          <div class="print-step__switch" :style="{ background: printState.cutGuides ? '#B5451E' : 'oklch(0.85 0.01 80)' }">
+            <div class="print-step__switch-knob" :style="{ left: printState.cutGuides ? '19px' : '3px' }"></div>
           </div>
         </div>
       </div>
@@ -66,14 +81,24 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
     </div>
 
     <div class="fab-print-sheet" style="display: none">
-      <div class="print-step__sheet-grid">
-        <div
-          v-for="item in state.printCards"
-          :key="item.id"
-          class="print-step__sheet-cell"
-          :style="{ outline: cutGuideOutline, outlineOffset: '-0.5px', breakBefore: item.breakBefore }"
-        >
-          <ProxyCard :card="item.props" />
+      <div
+        v-for="(pageCards, pageIndex) in printPages"
+        :key="pageIndex"
+        class="print-step__page"
+        :style="{
+          height: printSheetHeight,
+          breakAfter: pageIndex < printPages.length - 1 ? 'page' : 'auto',
+        }"
+      >
+        <div class="print-step__sheet-grid" :style="printGridStyle">
+          <div
+            v-for="item in pageCards"
+            :key="item.id"
+            class="print-step__sheet-cell"
+            :style="{ outline: cutGuideOutline, outlineOffset: '-0.5px' }"
+          >
+            <ProxyCard :card="item.props" />
+          </div>
         </div>
       </div>
     </div>
@@ -204,15 +229,17 @@ const { state, doPrint, setPaperSize, toggleBorderless, toggleCutGuides, pageCou
   max-width: 100%;
 }
 
+.print-step__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .print-step__sheet-grid {
   display: grid;
-  grid-template-columns: repeat(3, 2.5in);
-  grid-auto-rows: 3.5in;
 }
 
 .print-step__sheet-cell {
-  width: 2.5in;
-  height: 3.5in;
   box-sizing: border-box;
   padding: 2px;
 }

@@ -22,12 +22,18 @@ body {
 }
 
 @media print {
+  body,
+  .app {
+    min-height: 0 !important;
+  }
+  .app {
+    padding-bottom: 0 !important;
+  }
   .fab-app-chrome {
     display: none !important;
   }
   .fab-print-sheet {
-    display: flex !important;
-    justify-content: center;
+    display: block !important;
     padding: 0 !important;
   }
 }

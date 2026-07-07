@@ -4,15 +4,11 @@ import { normalizeDb, buildIndex, parseDecklist, cleanDecklistText } from "../li
 import { buildDisplayProps } from "../lib/cardDisplay";
 import { classifyGroup, maxQtyFor } from "../lib/classify";
 import { collectAutoTokens } from "../lib/tokens";
+import { usePrintSheet } from "./usePrintSheet";
 
 type Step = "deck" | "preview" | "print";
-type PaperSize = "letter" | "a4" | "legal";
 
-export interface PrintCard {
-  id: string;
-  props: ProxyCardProps;
-  breakBefore: "auto" | "page";
-}
+const { printState, buildPrintCards } = usePrintSheet();
 
 const state = reactive({
   step: "deck" as Step,
@@ -22,10 +18,6 @@ const state = reactive({
   parsedRows: [] as ParsedRow[],
   hasChecked: false,
   resolvedCards: [] as ResolvedCard[],
-  printCards: [] as PrintCard[],
-  paperSize: "letter" as PaperSize,
-  borderless: false,
-  cutGuides: true,
 });
 
 let loadPromise: Promise<void> | null = null;
@@ -80,7 +72,7 @@ function goToPreviewStep() {
 }
 
 function goToPrintStep() {
-  state.step = state.printCards.length ? "print" : "preview";
+  state.step = printState.printCards.length ? "print" : "preview";
 }
 
 function adjustQty(id: string, delta: number, maxQty?: number) {
@@ -95,33 +87,8 @@ function removeResolved(id: string) {
 }
 
 function goToPrint() {
-  const printCards: PrintCard[] = [];
-  let n = 0;
-  state.resolvedCards.forEach((entry) => {
-    const props = buildDisplayProps(entry.card, entry.printing);
-    for (let i = 0; i < entry.qty; i++) {
-      printCards.push({ id: entry.id + "-" + i, props, breakBefore: n > 0 && n % 9 === 0 ? "page" : "auto" });
-      n++;
-    }
-  });
-  state.printCards = printCards;
+  buildPrintCards(state.resolvedCards);
   state.step = "print";
-}
-
-function doPrint() {
-  window.print();
-}
-
-function setPaperSize(size: PaperSize) {
-  state.paperSize = size;
-}
-
-function toggleBorderless() {
-  state.borderless = !state.borderless;
-}
-
-function toggleCutGuides() {
-  state.cutGuides = !state.cutGuides;
 }
 
 export interface CardRowView {
@@ -170,12 +137,6 @@ const deckRows = computed(() =>
 const otherRows = computed(() =>
   state.resolvedCards.filter((e) => classifyGroup(e.card) === "other").map(toRow)
 );
-const pageCount = computed(() => Math.ceil(state.printCards.length / 9) || 0);
-const pageSizeCss: Record<PaperSize, string> = { letter: "8.5in 11in", a4: "8.27in 11.69in", legal: "8.5in 14in" };
-const printPageStyle = computed(
-  () => `@page { size: ${pageSizeCss[state.paperSize]}; margin: ${state.borderless ? "0" : "0.35in"}; }`
-);
-const cutGuideOutline = computed(() => (state.cutGuides ? "1px dashed rgba(28,27,25,0.35)" : "none"));
 
 export function useBuilder() {
   return {
@@ -187,10 +148,6 @@ export function useBuilder() {
     goToPreviewStep,
     goToPrintStep,
     goToPrint,
-    doPrint,
-    setPaperSize,
-    toggleBorderless,
-    toggleCutGuides,
     adjustQty,
     removeResolved,
     totalQty,
@@ -199,8 +156,5 @@ export function useBuilder() {
     arenaRows,
     deckRows,
     otherRows,
-    pageCount,
-    printPageStyle,
-    cutGuideOutline,
   };
 }
