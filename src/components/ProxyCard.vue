@@ -63,6 +63,12 @@ defineProps<{ card: ProxyCardProps }>();
   overflow: hidden;
   position: relative;
   background-color: #ffffff;
+  /* Browsers strip background colors when printing ("economy" mode), which
+     drops the pip color and type bar and forces their light text dark. Force
+     exact color rendering so the card prints as designed. Inherited by all
+     children, so the whole card is covered. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .proxy-card__header {
