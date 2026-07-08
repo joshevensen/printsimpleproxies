@@ -145,6 +145,10 @@ function removeResolved(id: string) {
   state.resolvedCards = state.resolvedCards.filter((r) => r.id !== id);
 }
 
+function clearAll() {
+  state.resolvedCards = [];
+}
+
 // ---- Card search (add one at a time) ----------------------------------
 
 function handleSearchChange(e: Event) {
@@ -353,6 +357,7 @@ export function useBuilder() {
     chooseMatch,
     adjustQty,
     removeResolved,
+    clearAll,
     handleSearchChange,
     totalQty,
     notFoundRows,
