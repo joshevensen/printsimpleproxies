@@ -136,7 +136,7 @@ defineProps<{ card: ProxyCardProps }>();
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.14;
+  opacity: 0.12;
   pointer-events: none;
 }
 
@@ -144,8 +144,9 @@ defineProps<{ card: ProxyCardProps }>();
   width: 80%;
   height: 80%;
   object-fit: contain;
+  /* Icons are white-on-black SVGs; invert to dark-on-transparent. Opacity
+     lives on the parent so there's a single watermark-strength knob. */
   filter: invert(1);
-  opacity: 0.5;
 }
 
 .proxy-card__text {
