@@ -46,6 +46,7 @@ export const KEYWORDS: KeywordEntry[] = [
   { name: "Spellvoid", description: "A one-time-use effect, primarily on equipment or items, that prevents arcane damage." },
   { name: "Surge", description: "Applies if a card deals more arcane damage than its printed amount." },
   { name: "Temper", description: "Equipment usually high in defense — at 1 defense, choose to defend once more and see it destroyed, or save it for its ability." },
+  { name: "Transcend", description: "A Mystic mechanic on double-faced cards. When this transcends — typically if you've played another blue card this turn — flip it to its Inner Chi back face and put it into your hand, where it stays for the rest of the game." },
   { name: "Unfreeze", description: "Removes Freeze from an object." },
   { name: "Ward", description: "If your hero would be dealt damage, prevent X of it and destroy this." },
 ];
